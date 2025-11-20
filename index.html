@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PANAL | Miel Gourmet de Querétaro</title>
+    
+    <!-- Tailwind CSS (Diseño) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts (Tipografía) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons (Iconos) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Librería de Animaciones AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Markdown Parser para la IA -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'honey-gold': '#F59E0B',
+                        'honey-light': '#FEF3C7',
+                        'honey-dark': '#92400E',
+                        'nature-green': '#3F6212',
+                        'ai-purple': '#8B5CF6', // Color para la IA
+                    },
+                    fontFamily: {
+                        'serif': ['Playfair Display', 'serif'],
+                        'sans': ['Lato', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html { scroll-behavior: smooth; }
+        
+        /* Fondo Hero: Campo al atardecer */
+        .hero-bg {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1473973266408-ed4e27abdd47?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        /* Efectos Hover */
+        .product-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .product-card:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        
+        /* Estilos para resultado IA */
+        .ai-content h3 { font-weight: bold; font-size: 1.1em; margin-bottom: 0.5em; color: #92400E; }
+        .ai-content ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em; }
+        .ai-content strong { color: #D97706; }
+        .ai-content p { margin-bottom: 0.8em; }
+
+        /* Loader */
+        .honey-loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FEF3C7;
+            border-bottom-color: #F59E0B;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        [data-aos] { pointer-events: auto !important; }
+    </style>
+</head>
+<body class="font-sans text-gray-700 bg-stone-50 overflow-x-hidden">
+
+    <!-- Navegación -->
+    <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-sm shadow-md transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-3xl font-serif font-bold text-honey-gold tracking-wider flex items-center gap-2">
+                <i class="fas fa-hexagon-nodes animate-pulse"></i> PANAL
+            </a>
+            
+            <!-- Menú Desktop -->
+            <div class="hidden md:flex space-x-8 text-honey-dark font-medium items-center">
+                <a href="#inicio" class="hover:text-honey-gold transition">Inicio</a>
+                <a href="#nosotros" class="hover:text-honey-gold transition">Nosotros</a>
+                <a href="#productos" class="hover:text-honey-gold transition">Productos</a>
+                <a href="#chef-virtual" class="text-ai-purple font-bold hover:text-purple-700 transition flex items-center gap-1">
+                    <i class="fas fa-wand-magic-sparkles text-sm"></i> Chef IA
+                </a>
+                <a href="#mayoreo" class="hover:text-honey-gold transition">Mayoreo</a>
+                <a href="#contacto" class="px-5 py-2 bg-honey-gold text-white rounded-full hover:bg-honey-dark transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">Contacto</a>
+            </div>
+
+            <!-- Botón Móvil -->
+            <button id="mobile-menu-btn" class="md:hidden text-2xl text-honey-dark">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- Menú Móvil -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full shadow-lg top-full left-0">
+            <div class="flex flex-col px-6 py-4 space-y-4 text-center">
+                <a href="#inicio" class="block text-gray-600 hover:text-honey-gold">Inicio</a>
+                <a href="#nosotros" class="block text-gray-600 hover:text-honey-gold">Nosotros</a>
+                <a href="#productos" class="block text-gray-600 hover:text-honey-gold">Productos</a>
+                <a href="#chef-virtual" class="block font-bold text-ai-purple">Chef Virtual ✨</a>
+                <a href="#mayoreo" class="block text-gray-600 hover:text-honey-gold">Negocios</a>
+                <a href="#contacto" class="block font-bold text-honey-gold">Contáctanos</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero-bg h-screen flex items-center justify-center text-center px-6">
+        <div class="max-w-4xl text-white">
+            <div data-aos="fade-down" data-aos-duration="1000">
+                <h1 class="text-6xl md:text-8xl font-serif font-bold mb-4 leading-tight drop-shadow-lg">
+                    PANAL
+                </h1>
+            </div>
+            <div data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                <p class="text-2xl md:text-3xl mb-10 font-light text-yellow-100 tracking-wider drop-shadow-md">
+                    Sabor Auténtico de Querétaro
+                </p>
+                <div class="flex flex-col md:flex-row gap-4 justify-center">
+                    <a href="#productos" class="px-8 py-3 bg-honey-gold text-white font-bold rounded-full text-lg hover:bg-honey-dark transition transform hover:-translate-y-1 shadow-lg">
+                        Ver Productos
+                    </a>
+                    <a href="#chef-virtual" class="px-8 py-3 bg-white/90 text-ai-purple font-bold rounded-full text-lg hover:bg-white transition transform hover:-translate-y-1 shadow-lg flex items-center justify-center gap-2 backdrop-blur-sm">
+                        <i class="fas fa-wand-magic-sparkles"></i> Probar IA
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nosotros -->
+    <section id="nosotros" class="py-24 px-6 bg-white">
+        <div class="container mx-auto flex flex-col md:flex-row items-center gap-12">
+            <div class="md:w-1/2 relative" data-aos="fade-right">
+                <div class="absolute -top-4 -left-4 w-24 h-24 bg-honey-light rounded-full -z-10"></div>
+                <img src="https://images.unsplash.com/photo-1587049548423-4213d939c911?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Apicultor Querétaro" class="rounded-lg shadow-2xl w-full object-cover h-[400px]">
+            </div>
+            <div class="md:w-1/2" data-aos="fade-left">
+                <h2 class="text-sm font-bold text-honey-gold uppercase tracking-wider mb-2">Nuestra Historia</h2>
+                <h3 class="text-4xl font-serif font-bold text-honey-dark mb-6">Tradición y Naturaleza</h3>
+                <p class="text-gray-600 mb-4 leading-relaxed text-lg">
+                    En <strong class="text-honey-dark">PANAL</strong>, creemos que la naturaleza nos ofrece los mejores regalos. Nacidos en el corazón de Querétaro, trabajamos de la mano con apicultores locales.
+                </p>
+                <div class="grid grid-cols-2 gap-4 text-honey-dark mt-6">
+                    <div class="flex items-center gap-2"><i class="fas fa-check-circle text-honey-gold"></i> 100% Natural</div>
+                    <div class="flex items-center gap-2"><i class="fas fa-check-circle text-honey-gold"></i> Artesanal</div>
+                    <div class="flex items-center gap-2"><i class="fas fa-check-circle text-honey-gold"></i> Sin Químicos</div>
+                    <div class="flex items-center gap-2"><i class="fas fa-check-circle text-honey-gold"></i> Hecho en México</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Productos -->
+    <section id="productos" class="py-24 px-6 bg-stone-50">
+        <div class="container mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl font-serif font-bold text-honey-dark mb-4">Nuestra Colección</h2>
+                <div class="w-20 h-1 bg-honey-gold mx-auto"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Producto 1 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden product-card group" data-aos="fade-up" data-aos-delay="100">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1589820296156-2454bb8a4d50?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Miel de Abeja" class="w-full h-full object-cover transition duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-serif font-bold text-gray-800 mb-2">Miel de Abeja</h3>
+                        <p class="text-gray-600 text-sm mb-4">Miel multifloral 100% virgen. Sabor puro del campo.</p>
+                        <button onclick="scrollToContact('Miel de Abeja')" class="w-full border border-honey-gold text-honey-dark font-bold py-2 rounded hover:bg-honey-gold hover:text-white transition">Cotizar</button>
+                    </div>
+                </div>
+                <!-- Producto 2 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden product-card group" data-aos="fade-up" data-aos-delay="200">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1612437113086-2df7e1178966?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Polen" class="w-full h-full object-cover transition duration-500 hover:scale-110">
+                        <div class="absolute top-4 right-4 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">Superfood</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-serif font-bold text-gray-800 mb-2">Polen</h3>
+                        <p class="text-gray-600 text-sm mb-4">Energía natural. Rico en proteínas y vitaminas.</p>
+                        <button onclick="scrollToContact('Polen')" class="w-full border border-honey-gold text-honey-dark font-bold py-2 rounded hover:bg-honey-gold hover:text-white transition">Cotizar</button>
+                    </div>
+                </div>
+                <!-- Producto 3 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden product-card group" data-aos="fade-up" data-aos-delay="300">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1629272278262-9337b9802c14?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Miel con Canela" class="w-full h-full object-cover transition duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-serif font-bold text-gray-800 mb-2">Miel con Canela</h3>
+                        <p class="text-gray-600 text-sm mb-4">Fusión gourmet. Dulzor con un toque especiado.</p>
+                        <button onclick="scrollToContact('Miel con Canela')" class="w-full border border-honey-gold text-honey-dark font-bold py-2 rounded hover:bg-honey-gold hover:text-white transition">Cotizar</button>
+                    </div>
+                </div>
+                <!-- Producto 4 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden product-card group" data-aos="fade-up" data-aos-delay="400">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Bálsamo" class="w-full h-full object-cover transition duration-500 hover:scale-110">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-serif font-bold text-gray-800 mb-2">Bálsamo Cherry</h3>
+                        <p class="text-gray-600 text-sm mb-4">Hidratación profunda con esencia natural de cereza.</p>
+                        <button onclick="scrollToContact('Bálsamo Cherry')" class="w-full border border-honey-gold text-honey-dark font-bold py-2 rounded hover:bg-honey-gold hover:text-white transition">Cotizar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN NUEVA: CHEF VIRTUAL GEMINI AI -->
+    <section id="chef-virtual" class="py-24 px-6 bg-purple-50 relative overflow-hidden">
+        <!-- Decoración Fondo -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-purple-200 rounded-full filter blur-3xl opacity-30 -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-honey-gold rounded-full filter blur-3xl opacity-20 translate-y-1/2 -translate-x-1/2"></div>
+
+        <div class="container mx-auto max-w-6xl relative z-10">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <div class="inline-block px-4 py-1 bg-white text-ai-purple rounded-full text-sm font-bold shadow-sm mb-4 border border-purple-100">
+                    <i class="fas fa-sparkles mr-2"></i> Powered by Gemini AI
+                </div>
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-4">Chef Virtual PANAL ✨</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+                    ¿Qué tienes en tu cocina? Nuestra IA te sugiere recetas exclusivas o el maridaje perfecto con nuestras mieles.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+                <!-- Panel de Entrada -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-purple-100" data-aos="fade-right">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        <span class="bg-ai-purple text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+                        Ingresa tus ingredientes
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Cuéntanos qué ingredientes tienes o qué deseas acompañar:</label>
+                            <textarea id="aiInput" rows="4" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-ai-purple focus:border-transparent outline-none transition bg-gray-50 resize-none" placeholder="Ej: Tengo pollo, almendras y romero... O: ¿Qué miel queda mejor con una tabla de quesos fuertes?"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <button onclick="callGemini('recipe')" class="group w-full bg-honey-gold text-white font-bold py-4 rounded-xl hover:bg-honey-dark transition shadow-lg flex flex-col items-center justify-center gap-1 border-b-4 border-yellow-600 active:border-b-0 active:translate-y-1">
+                                <span class="flex items-center gap-2 text-lg">Crear Receta <i class="fas fa-utensils"></i></span>
+                                <span class="text-xs font-normal text-yellow-100 opacity-80">Cocina con Miel</span>
+                            </button>
+                            
+                            <button onclick="callGemini('pairing')" class="group w-full bg-ai-purple text-white font-bold py-4 rounded-xl hover:bg-purple-700 transition shadow-lg flex flex-col items-center justify-center gap-1 border-b-4 border-purple-800 active:border-b-0 active:translate-y-1">
+                                <span class="flex items-center gap-2 text-lg">Maridaje <i class="fas fa-wine-glass"></i></span>
+                                <span class="text-xs font-normal text-purple-200 opacity-80">Experto Sommelier</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de Resultados -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl border-2 border-dashed border-gray-200 min-h-[400px] flex flex-col relative" data-aos="fade-left">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <span class="bg-honey-gold text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+                        Tu Resultado Gourmet
+                    </h3>
+
+                    <!-- Placeholder -->
+                    <div id="aiPlaceholder" class="flex-1 flex flex-col items-center justify-center text-gray-400 text-center p-6 opacity-60">
+                        <i class="fas fa-robot text-6xl mb-4 text-gray-200"></i>
+                        <p>Espera tu receta mágica aquí...</p>
+                    </div>
+
+                    <!-- Loading -->
+                    <div id="aiLoading" class="hidden flex-1 flex flex-col items-center justify-center text-center p-6">
+                        <div class="honey-loader mb-6"></div>
+                        <p class="text-gray-600 font-medium animate-pulse">El Chef Virtual está pensando...</p>
+                        <p class="text-xs text-gray-400 mt-2">Combinando sabores de PANAL</p>
+                    </div>
+
+                    <!-- Output -->
+                    <div id="aiOutputContainer" class="hidden flex-1 overflow-y-auto max-h-[500px] pr-2">
+                        <div class="bg-yellow-50 rounded-xl p-6 border border-yellow-100">
+                            <div id="aiOutput" class="ai-content text-gray-700 leading-relaxed text-sm md:text-base"></div>
+                        </div>
+                        <button onclick="copyToClipboard()" class="mt-4 text-sm text-ai-purple font-bold hover:text-purple-700 transition flex items-center justify-center gap-2 mx-auto w-full">
+                            <i class="fas fa-copy"></i> Copiar Resultado
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Mayoreo (B2B) -->
+    <section id="mayoreo" class="py-24 px-6 bg-honey-dark relative overflow-hidden">
+        <div class="absolute top-0 right-0 text-9xl text-white opacity-5 transform translate-x-10 -translate-y-10 rotate-12">
+            <i class="fas fa-leaf"></i>
+        </div>
+
+        <div class="container mx-auto text-center relative z-10">
+            <div data-aos="fade-up">
+                <h2 class="text-3xl md:text-5xl font-serif font-bold text-white mb-6">Soluciones para Tu Negocio</h2>
+                <p class="text-honey-light text-lg max-w-3xl mx-auto mb-12">
+                    Ofrecemos precios especiales por volumen para elevar la experiencia de tus clientes.
+                </p>
+            </div>
+
+            <!-- Grid Iconos -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto mb-16">
+                <div class="text-center group p-4 rounded-xl hover:bg-white/10 transition duration-300" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="w-20 h-20 mx-auto bg-white/10 rounded-full flex items-center justify-center text-honey-gold mb-4 group-hover:bg-white group-hover:text-honey-dark transition duration-300 shadow-lg">
+                        <i class="fas fa-utensils text-3xl"></i>
+                    </div>
+                    <h4 class="text-white font-bold text-lg">Restaurantes</h4>
+                </div>
+                <div class="text-center group p-4 rounded-xl hover:bg-white/10 transition duration-300" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="w-20 h-20 mx-auto bg-white/10 rounded-full flex items-center justify-center text-honey-gold mb-4 group-hover:bg-white group-hover:text-honey-dark transition duration-300 shadow-lg">
+                        <i class="fas fa-hotel text-3xl"></i>
+                    </div>
+                    <h4 class="text-white font-bold text-lg">Hoteles</h4>
+                </div>
+                <div class="text-center group p-4 rounded-xl hover:bg-white/10 transition duration-300" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="w-20 h-20 mx-auto bg-white/10 rounded-full flex items-center justify-center text-honey-gold mb-4 group-hover:bg-white group-hover:text-honey-dark transition duration-300 shadow-lg">
+                        <i class="fas fa-mug-hot text-3xl"></i>
+                    </div>
+                    <h4 class="text-white font-bold text-lg">Cafeterías</h4>
+                </div>
+                <div class="text-center group p-4 rounded-xl hover:bg-white/10 transition duration-300" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="w-20 h-20 mx-auto bg-white/10 rounded-full flex items-center justify-center text-honey-gold mb-4 group-hover:bg-white group-hover:text-honey-dark transition duration-300 shadow-lg">
+                        <i class="fas fa-gift text-3xl"></i>
+                    </div>
+                    <h4 class="text-white font-bold text-lg">Regalos Corp.</h4>
+                </div>
+            </div>
+
+            <a href="#contacto" class="inline-block px-10 py-4 bg-white text-honey-dark font-bold text-lg rounded-full hover:bg-gray-100 transition shadow-xl transform hover:scale-105">
+                Solicitar Catálogo B2B
+            </a>
+        </div>
+    </section>
+
+    <!-- Contacto -->
+    <section id="contacto" class="py-24 px-6">
+        <div class="container mx-auto max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row" data-aos="zoom-in-up">
+            <!-- Info -->
+            <div class="bg-honey-gold p-10 md:w-2/5 flex flex-col justify-between text-white">
+                <div>
+                    <h3 class="text-3xl font-serif font-bold mb-6">Hablemos</h3>
+                    <p class="mb-8 text-honey-light">Déjanos tus datos y nos pondremos en contacto contigo.</p>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4"><i class="fas fa-map-marker-alt w-6"></i> Querétaro, Qro.</div>
+                        <div class="flex items-center gap-4"><i class="fas fa-phone w-6"></i> (442) 123-4567</div>
+                        <div class="flex items-center gap-4"><i class="fas fa-envelope w-6"></i> ventas@panal.mx</div>
+                    </div>
+                </div>
+                <div class="mt-10">
+                    <div class="flex gap-4">
+                        <a href="#" class="hover:text-honey-dark"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="hover:text-honey-dark"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="hover:text-honey-dark"><i class="fab fa-whatsapp fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <div class="p-10 md:w-3/5">
+                <h3 class="text-2xl font-bold text-honey-dark mb-6">Envíanos un mensaje</h3>
+                <form id="contactForm" class="space-y-6" onsubmit="handleSubmit(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <input type="text" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-honey-gold" placeholder="Nombre">
+                        <input type="text" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-honey-gold" placeholder="Empresa">
+                    </div>
+                    <input type="email" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-honey-gold" placeholder="Correo Electrónico">
+                    <select id="interestSelect" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-honey-gold text-gray-600">
+                        <option>Información General</option>
+                        <option>Miel de Abeja</option>
+                        <option>Polen</option>
+                        <option>Miel con Canela</option>
+                        <option>Bálsamo Cherry</option>
+                        <option>Mayoreo / Restaurantes</option>
+                    </select>
+                    <textarea rows="4" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-honey-gold" placeholder="Mensaje"></textarea>
+                    <button type="submit" class="w-full bg-honey-dark text-white font-bold py-3 rounded-lg hover:bg-opacity-90 transition shadow-lg">Enviar Mensaje</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-10 border-t border-gray-800">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-2xl font-serif font-bold text-honey-gold mb-2">PANAL</h2>
+            <p class="text-gray-400 text-sm">&copy; 2023 PANAL. Hecho en Querétaro.</p>
+        </div>
+    </footer>
+
+    <!-- Modal Éxito -->
+    <div id="successModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center px-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl animate-fade-in-up">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-check text-2xl text-green-600"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">¡Enviado!</h3>
+            <p class="text-gray-600 mb-6">Nos pondremos en contacto contigo pronto.</p>
+            <button onclick="closeModal()" class="w-full bg-honey-gold text-white font-bold py-2 rounded-lg hover:bg-honey-dark transition">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ once: true, offset: 50 });
+
+        // Mobile Menu
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Scroll Logic
+        function scrollToContact(producto) {
+            const select = document.getElementById('interestSelect');
+            for (let i = 0; i < select.options.length; i++) {
+                if (select.options[i].text.includes(producto)) {
+                    select.selectedIndex = i;
+                    break;
+                }
+            }
+            document.getElementById('contacto').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Form Logic
+        function handleSubmit(e) {
+            e.preventDefault();
+            document.getElementById('successModal').classList.remove('hidden');
+            e.target.reset();
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('successModal')) closeModal();
+        }
+
+        // Navbar Scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-lg');
+                nav.classList.replace('py-4', 'py-2');
+            } else {
+                nav.classList.remove('shadow-lg');
+                nav.classList.replace('py-2', 'py-4');
+            }
+        });
+
+        // ==========================================
+        // LÓGICA DE GEMINI API (CHEF VIRTUAL)
+        // ==========================================
+        const apiKey = ""; // API Key Inyectada por el entorno
+
+        async function callGemini(type) {
+            const input = document.getElementById('aiInput').value;
+            if (!input.trim()) {
+                alert("Por favor, cuéntanos qué ingredientes tienes o qué deseas maridar.");
+                return;
+            }
+
+            // UI Updates
+            const placeholder = document.getElementById('aiPlaceholder');
+            const loading = document.getElementById('aiLoading');
+            const outputContainer = document.getElementById('aiOutputContainer');
+            const output = document.getElementById('aiOutput');
+
+            placeholder.classList.add('hidden');
+            outputContainer.classList.add('hidden');
+            loading.classList.remove('hidden');
+
+            // Prompt Engineering
+            let systemPrompt = "Eres un chef experto y sommelier de miel de la empresa 'PANAL' (Miel Gourmet de Querétaro). Tu tono es elegante, cálido y gourmet. Tus respuestas deben ser breves pero creativas.";
+            let userPrompt = "";
+
+            if (type === 'recipe') {
+                userPrompt = `El usuario tiene estos ingredientes o idea: "${input}".
+                Crea una receta breve y creativa que utilice alguno de los siguientes productos PANAL: Miel de Abeja, Polen, Miel con Canela o Bálsamo Cherry (solo si aplica metafóricamente, pero mejor usa los comestibles). 
+                Usa formato Markdown simple (negritas, listas). Titula la receta de forma atractiva.`;
+            } else {
+                userPrompt = `El usuario pregunta por maridaje para: "${input}".
+                Sugiere qué producto de PANAL (Miel de Abeja, Polen, Miel con Canela) acompaña mejor este platillo o momento y por qué. Explica los sabores. Sé breve y sofisticado.`;
+            }
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: userPrompt }]
+                        }],
+                        systemInstruction: {
+                            parts: [{ text: systemPrompt }]
+                        }
+                    })
+                });
+
+                if (!response.ok) throw new Error('Error en la API');
+
+                const data = await response.json();
+                const text = data.candidates[0].content.parts[0].text;
+
+                // Renderizado con Marked (Markdown a HTML)
+                output.innerHTML = marked.parse(text);
+
+                loading.classList.add('hidden');
+                outputContainer.classList.remove('hidden');
+
+            } catch (error) {
+                console.error(error);
+                loading.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+                alert("Lo sentimos, el Chef Virtual está tomando un descanso. Intenta de nuevo.");
+            }
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('aiOutput').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("¡Resultado copiado al portapapeles!");
+            });
+        }
+    </script>
+</body>
+</html>         
