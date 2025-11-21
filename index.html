@@ -226,6 +226,7 @@
 
     <!-- SECCIÓN CHEF VIRTUAL GEMINI AI -->
     <section id="chef-virtual" class="py-24 px-6 bg-purple-50 relative overflow-hidden">
+        <!-- Decoración Fondo -->
         <div class="absolute top-0 right-0 w-64 h-64 bg-purple-200 rounded-full filter blur-3xl opacity-30 -translate-y-1/2 translate-x-1/2"></div>
         <div class="absolute bottom-0 left-0 w-64 h-64 bg-honey-gold rounded-full filter blur-3xl opacity-20 translate-y-1/2 -translate-x-1/2"></div>
 
@@ -285,12 +286,17 @@
                     <div id="aiLoading" class="hidden flex-1 flex flex-col items-center justify-center text-center p-6">
                         <div class="honey-loader mb-6"></div>
                         <p class="text-gray-600 font-medium animate-pulse">El Chef Virtual está pensando...</p>
+                        <p id="loadingText" class="text-xs text-gray-400 mt-2">Consultando...</p>
                     </div>
 
                     <!-- Output -->
                     <div id="aiOutputContainer" class="hidden flex-1 overflow-y-auto max-h-[500px] pr-2">
                         <div class="bg-yellow-50 rounded-xl p-6 border border-yellow-100">
                             <div id="aiOutput" class="ai-content text-gray-700 leading-relaxed text-sm md:text-base"></div>
+                        </div>
+                        <!-- Error Display -->
+                        <div id="errorDisplay" class="hidden mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                            <strong class="font-bold">¡Ups!</strong> <span id="errorMessage"></span>
                         </div>
                         <button onclick="copyToClipboard()" class="mt-4 text-sm text-ai-purple font-bold hover:text-purple-700 transition flex items-center justify-center gap-2 mx-auto w-full">
                             <i class="fas fa-copy"></i> Copiar Resultado
@@ -465,9 +471,18 @@
         });
 
         // ==========================================
-        // LÓGICA DE GEMINI API (CHEF VIRTUAL)
+        // LÓGICA DE GEMINI API (AUTO-REPARABLE)
         // ==========================================
-        const apiKey = "AIzaSyACmpXhqM9hgJy1YVvDRHXPpZd-NJFPF4g"; // API Key Inyectada por el entorno
+        
+        // ⚠️ TU LLAVE YA ESTÁ AQUÍ 👇
+        const apiKey = "AIzaSyACmpXhqM9hgJy1YVvDRHXPpZd-NJFPF4g"; 
+
+        // LISTA DE MODELOS PARA PROBAR
+        const modelsToTry = [
+            "gemini-1.5-flash",
+            "gemini-1.5-flash-latest",
+            "gemini-1.0-pro"
+        ];
 
         async function callGemini(type) {
             const input = document.getElementById('aiInput').value;
@@ -481,9 +496,13 @@
             const loading = document.getElementById('aiLoading');
             const outputContainer = document.getElementById('aiOutputContainer');
             const output = document.getElementById('aiOutput');
+            const loadingText = document.getElementById('loadingText'); // Elemento nuevo en tu diseño anterior
+            const errorDisplay = document.getElementById('errorDisplay');
+            const errorMessage = document.getElementById('errorMessage');
 
             placeholder.classList.add('hidden');
             outputContainer.classList.add('hidden');
+            if(errorDisplay) errorDisplay.classList.add('hidden');
             loading.classList.remove('hidden');
 
             // Prompt Engineering
@@ -499,43 +518,64 @@
                 Sugiere qué producto de PANAL (Miel de Abeja, Polen, Miel con Canela) acompaña mejor este platillo o momento y por qué. Explica los sabores. Sé breve y sofisticado.`;
             }
 
-            try {
-                // ⚠️ CAMBIO AQUÍ: Usamos el modelo estable gemini-1.5-flash
-                // Y combinamos el System Prompt con el User Prompt para evitar errores 400
-                const finalPrompt = systemPrompt + "\n\n" + userPrompt;
+            let success = false;
+            let lastError = "";
 
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: finalPrompt }]
-                        }]
-                    })
-                });
+            // BUCLE DE INTENTOS CON DIFERENTES MODELOS
+            for (const model of modelsToTry) {
+                try {
+                    console.log(`Intentando conectar con modelo: ${model}...`);
+                    if(loadingText) loadingText.innerText = `Consultando modelo ${model}...`; // Feedback visual
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error("Error API:", errorData);
-                    throw new Error(`Error: ${errorData.error.message || response.statusText}`);
+                    const finalPrompt = systemPrompt + "\n\n" + userPrompt;
+
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{ text: finalPrompt }]
+                            }]
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error.message || response.statusText);
+                    }
+
+                    const data = await response.json();
+                    if (!data.candidates || data.candidates.length === 0) throw new Error("La IA no devolvió respuesta.");
+
+                    const text = data.candidates[0].content.parts[0].text;
+
+                    // Renderizado con Marked (Markdown a HTML)
+                    output.innerHTML = marked.parse(text);
+
+                    loading.classList.add('hidden');
+                    outputContainer.classList.remove('hidden');
+                    success = true;
+                    break; // ¡Éxito! Salimos del bucle
+
+                } catch (error) {
+                    console.warn(`Fallo con ${model}:`, error);
+                    lastError = error.message;
+                    // Continuamos al siguiente modelo...
                 }
+            }
 
-                const data = await response.json();
-                const text = data.candidates[0].content.parts[0].text;
-
-                // Renderizado con Marked (Markdown a HTML)
-                output.innerHTML = marked.parse(text);
-
+            if (!success) {
                 loading.classList.add('hidden');
                 outputContainer.classList.remove('hidden');
-
-            } catch (error) {
-                console.error(error);
-                loading.classList.add('hidden');
-                placeholder.classList.remove('hidden');
-                alert("Hubo un error: " + error.message);
+                // Si tienes el div de error display en tu HTML, lo usamos, si no, alert
+                if(errorDisplay && errorMessage) {
+                    errorDisplay.classList.remove('hidden');
+                    errorMessage.innerText = "No se pudo conectar. " + lastError;
+                } else {
+                    alert("Lo sentimos, el Chef Virtual no pudo conectar. Error: " + lastError);
+                }
             }
         }
 
